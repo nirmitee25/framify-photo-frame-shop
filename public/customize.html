@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customise a Frame | Framify</title>
+    <link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="brand" href="frame.html">framify<span>.</span></a>
+
+    <nav class="nav">
+        <a href="frame.html">Home</a>
+        <a href="product.html">Shop frames</a>
+        <a class="active" href="customize.html">Customize</a>
+        <a href="index.html">Account</a>
+        <a class="cart-pill" href="cart.html">
+            Cart (<span class="cartCount">0</span>)
+        </a>
+    </nav>
+</header>
+
+<main class="wrap">
+
+    <section class="page-intro">
+        <span class="eyebrow">Made just for you</span>
+        <h1>Design your own frame.</h1>
+        <p>
+            Choose a style and size, upload your photo and tell us
+            how you imagine it.
+        </p>
+    </section>
+
+    <section class="content-card">
+
+        <form id="frameForm" enctype="multipart/form-data">
+
+            <div class="form-grid">
+
+                <div class="form-field">
+                    <label for="name">Full name *</label>
+                    <input
+                        class="field"
+                        id="name"
+                        name="name"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="email">Email address *</label>
+                    <input
+                        class="field"
+                        id="email"
+                        name="email"
+                        type="email"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="phone">Phone number *</label>
+                    <input
+                        class="field"
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        pattern="[0-9+() -]{8,18}"
+                        required
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="frameType">Frame style *</label>
+                    <select class="field" id="frameType"
+                            name="frameType" required>
+                        <option value="">Choose a style</option>
+                        <option value="Classic wood">Classic wood</option>
+                        <option value="Modern minimal">Modern minimal</option>
+                        <option value="Rustic">Rustic</option>
+                        <option value="Vintage">Vintage</option>
+                        <option value="Acrylic">Acrylic</option>
+                        <option value="Collage">Collage</option>
+                        <option value="Certificate">Certificate</option>
+                        <option value="Shadow box">Shadow box</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="frameSize">Frame size *</label>
+                    <select class="field" id="frameSize"
+                            name="frameSize" required>
+                        <option value="">Choose a size</option>
+                        <option value="Small (4 × 6 in)">Small (4 × 6 in)</option>
+                        <option value="Medium (8 × 10 in)">Medium (8 × 10 in)</option>
+                        <option value="Large (12 × 16 in)">Large (12 × 16 in)</option>
+                        <option value="Extra large (16 × 20 in)">Extra large (16 × 20 in)</option>
+                        <option value="Custom size">Custom size</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="photo">Upload photo or artwork *</label>
+                    <input
+                        class="field"
+                        id="photo"
+                        name="photo"
+                        type="file"
+                        accept="image/*"
+                        required
+                    >
+
+                    <img
+                        id="preview"
+                        class="preview-img"
+                        alt="Your uploaded photo preview"
+                        style="display:none;max-width:100%;height:auto;margin-top:15px;border-radius:12px;"
+                    >
+
+                    <p id="photoMessage" class="message" role="status"></p>
+                </div>
+
+                <div class="form-field full">
+                    <label for="message">Special instructions</label>
+                    <textarea
+                        class="field"
+                        id="message"
+                        name="message"
+                        placeholder="Colour, finish, exact measurements or anything else you have in mind…"
+                    ></textarea>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button class="btn" type="submit" id="submitButton">
+                    Send custom request ↗
+                </button>
+            </div>
+
+            <p id="responseMessage" class="message" role="status"></p>
+
+        </form>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    <strong>framify.</strong>
+    <p>Frame Your Memories, Showcase Your Style.</p>
+    <p>© 2026 Framify</p>
+</footer>
+
+<script>
+"use strict";
+
+// Update cart count
+function updateCartCount() {
+    try {
+        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+        const count = Array.isArray(cart)
+            ? cart.reduce((total, item) => {
+                return total + Math.max(
+                    1,
+                    Number(item.quantity) || 1
+                );
+            }, 0)
+            : 0;
+
+        document.querySelectorAll(".cartCount").forEach(element => {
+            element.textContent = count;
+        });
+    } catch (error) {
+        document.querySelectorAll(".cartCount").forEach(element => {
+            element.textContent = "0";
+        });
+    }
+}
+
+updateCartCount();
+
+// Photo upload and preview
+const photo = document.getElementById("photo");
+const preview = document.getElementById("preview");
+const photoMessage = document.getElementById("photoMessage");
+
+let previewURL = null;
+
+photo.addEventListener("change", function () {
+    const file = photo.files[0];
+
+    photoMessage.textContent = "";
+    photoMessage.className = "message";
+
+    if (previewURL) {
+        URL.revokeObjectURL(previewURL);
+        previewURL = null;
+    }
+
+    preview.removeAttribute("src");
+    preview.style.display = "none";
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        photo.value = "";
+        photoMessage.className = "message error";
+        photoMessage.textContent = "Please select an image file.";
+        return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+
+    if (file.size > maxSize) {
+        photo.value = "";
+        photoMessage.className = "message error";
+        photoMessage.textContent =
+            "Please select an image smaller than 5 MB.";
+        return;
+    }
+
+    previewURL = URL.createObjectURL(file);
+    preview.src = previewURL;
+    preview.style.display = "block";
+});
+
+// Submit customization request
+document.getElementById("frameForm").addEventListener(
+    "submit",
+    async function (event) {
+        event.preventDefault();
+
+        const form = event.currentTarget;
+        const button = document.getElementById("submitButton");
+        const message = document.getElementById("responseMessage");
+
+        if (!form.reportValidity()) return;
+
+        button.disabled = true;
+        button.textContent = "Sending request…";
+
+        message.className = "message";
+        message.textContent = "Submitting your custom frame details…";
+
+        try {
+            const response = await fetch("/api/customize", {
+                method: "POST",
+                body: new FormData(form)
+            });
+
+            let result;
+
+            try {
+                result = await response.json();
+            } catch (error) {
+                throw new Error(
+                    "Invalid server response. Check your backend."
+                );
+            }
+
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.error || "Could not save your request."
+                );
+            }
+
+            message.className = "message success";
+            message.textContent =
+                "Your custom frame request was submitted successfully!";
+
+            form.reset();
+
+            if (previewURL) {
+                URL.revokeObjectURL(previewURL);
+                previewURL = null;
+            }
+
+            preview.removeAttribute("src");
+            preview.style.display = "none";
+
+            photoMessage.textContent = "";
+
+        } catch (error) {
+            message.className = "message error";
+
+            if (error instanceof TypeError) {
+                message.textContent =
+                    "Cannot connect to Framify. Start the backend " +
+                    "and check your MongoDB connection.";
+            } else {
+                message.textContent = error.message;
+            }
+
+        } finally {
+            button.disabled = false;
+            button.textContent = "Send custom request ↗";
+        }
+    }
+);
+</script>
+
+</body>
+</html>

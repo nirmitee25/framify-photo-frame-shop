@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#171a2b">
+<title>Shop Frames | Framify</title>
+<link rel="stylesheet" href="site.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+:root{--ink:#292044;--muted:#6f6880;--paper:#fff9f4;--accent:#f05a8a;--accent-dark:#bc3474;--line:#f0dce8;--white:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 8% 0%,#fff0f6 0,transparent 35%),radial-gradient(ellipse at 95% 18%,#fff0d8 0,transparent 32%),#fff9f4;color:var(--ink);font-family:'DM Sans',Arial,sans-serif;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.site-header{background:rgba(41,32,68,.97);color:white;padding:15px clamp(18px,5vw,72px);display:flex;align-items:center;justify-content:space-between;gap:20px;position:sticky;top:0;z-index:5;box-shadow:0 6px 24px #10121b24}
+.brand{font-size:25px;font-weight:700;letter-spacing:.5px}
+.brand span{color:#ff8fb3}
+.nav{display:flex;gap:25px;align-items:center;font-size:14px}
+.nav a{color:#f2edf0;transition:color .2s}
+.nav a:hover{color:#ffb4cf}
+.cart-pill,.btn-primary,.add-btn{background:linear-gradient(120deg,#f05a8a,#9b5de5);color:#fff}
+.cart-pill{padding:8px 13px;border-radius:30px}
+.cart-pill:hover,.btn-primary:hover,.add-btn:hover{background:linear-gradient(120deg,#db3d7a,#7445d4)}
+.hero{padding:60px 22px 48px;text-align:center;background:linear-gradient(125deg,#ffe3ef,#fff0d8 52%,#e9e2ff)}
+.eyebrow{text-transform:uppercase;letter-spacing:3px;font-size:11px;color:#c43b82;font-weight:700}
+.hero h1{font-family:'Playfair Display',Georgia,serif;font-size:clamp(34px,5vw,58px);line-height:1.12;margin:13px 0}
+.hero p{max-width:570px;margin:0 auto;color:#686777;font-size:15px}
+.hero-actions{display:flex;justify-content:center;gap:12px;margin-top:23px;flex-wrap:wrap}
+.btn{border:0;border-radius:8px;padding:11px 17px;font-weight:700;transition:transform .2s,background .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:linear-gradient(120deg,#f05a8a,#9b5de5)}
+.btn-light{background:white;border:1px solid var(--line);color:var(--ink)}
+main{max-width:1320px;margin:auto;padding:30px clamp(16px,4vw,48px) 55px}
+.toolbar{display:grid;grid-template-columns:minmax(200px,1.5fr) repeat(2,minmax(145px,.7fr)) auto;gap:12px;margin-bottom:17px}
+.field{width:100%;border:1px solid #e2d9d1;background:#fff;border-radius:9px;padding:12px 13px;outline:none;color:var(--ink)}
+.field:focus{border-color:#f05a8a;box-shadow:0 0 0 3px #f05a8a24}
+.toolbar label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin:0 0 5px 3px}
+.filter-wrap{min-width:0}
+.result-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0;color:var(--muted);font-size:13px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 20px}
+.chip{border:1px solid var(--line);background:white;color:#656577;border-radius:30px;padding:7px 13px;font-size:12px}
+.chip.active,.chip:hover{background:#9b5de5;color:white;border-color:#9b5de5}
+.product-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.product-card{min-width:0;background:white;border:1px solid #f0dce8;border-radius:18px;overflow:hidden;transition:transform .25s,box-shadow .25s;position:relative;animation:appear .35s ease both}
+.product-card:hover{transform:translateY(-5px);border-color:#f3a6c5;box-shadow:0 18px 35px #a747791c}
+.photo-wrap{height:225px;background:#fff0f6;position:relative;overflow:hidden}
+.photo-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .45s}
+.product-card:hover .photo-wrap img{transform:scale(1.045)}
+.tag{position:absolute;left:12px;top:12px;background:#fffdf8ef;border-radius:20px;padding:5px 9px;font-size:10px;font-weight:700;color:#7b5745}
+.heart{position:absolute;right:12px;top:12px;width:35px;height:35px;border:0;border-radius:50%;background:#ffffffed;color:#655b5a;font-size:19px;display:grid;place-items:center}
+.heart.saved{color:#e44783}
+.product-info{padding:15px}
+.category{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#c43b82;font-weight:700}
+.product-info h3{font-size:15px;margin:5px 0 4px;line-height:1.35}
+.desc{font-size:12px;color:var(--muted);min-height:36px;margin:0 0 12px}
+.price-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.price{font-size:17px;font-weight:700}
+.add-btn{border:0;border-radius:7px;padding:9px 11px;font-size:12px;font-weight:700;transition:background .2s}
+.empty{grid-column:1/-1;text-align:center;padding:55px 15px;background:white;border:1px dashed var(--line);border-radius:12px;color:var(--muted)}
+.empty strong{display:block;color:var(--ink);font-size:18px;margin-bottom:5px}
+.toast{position:fixed;bottom:22px;right:22px;background:#202235;color:white;padding:13px 18px;border-radius:10px;box-shadow:0 10px 35px #0003;opacity:0;transform:translateY(12px);pointer-events:none;transition:.25s;z-index:10}
+.toast.show{opacity:1;transform:translateY(0)}
+footer{background:linear-gradient(110deg,#292044,#53306d);color:#d7d5df;text-align:center;padding:25px 16px;font-size:12px}
+footer strong{color:#ff8fb3}
+@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1000px){.product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.photo-wrap{height:210px}.toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){
+.site-header{position:sticky;top:0;align-items:flex-start;flex-direction:column;gap:10px;padding:12px 14px}
+.nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px 9px;width:100%}
+.nav a{font-size:12px;text-align:center;padding:7px 4px;border-radius:9px;background:#ffffff18}
+.nav .cart-pill{background:linear-gradient(120deg,#f05a8a,#9b5de5)}
+.hero{padding:34px 15px}
+.hero h1{font-size:clamp(32px,9vw,44px)}
+.toolbar{grid-template-columns:1fr}
+.product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.photo-wrap{height:clamp(135px,42vw,185px)}
+.product-info{padding:10px}
+.price-row{gap:8px}
+.price{font-size:15px}
+.add-btn{padding:10px 8px}
+.desc{min-height:45px}
+.result-row{align-items:flex-start;flex-direction:column}
+}
+@media(max-width:360px){.nav{grid-template-columns:repeat(2,minmax(0,1fr))}.product-grid{grid-template-columns:1fr}.photo-wrap{height:230px}}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #f05a8a;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<header class="site-header">
+<a class="brand" href="frame.html">framify<span>.</span></a>
+<nav class="nav" aria-label="Main navigation">
+<a href="frame.html">Home</a>
+<a href="product.html">Shop frames</a>
+<a href="customize.html">Customize</a>
+<a href="index.html">Account</a>
+<a href="cart.html" class="cart-pill">Cart (<span id="cartCount">0</span>)</a>
+</nav>
+</header>
+
+<section class="hero">
+<div class="eyebrow">Made for your memories</div>
+<h1>Find your perfect frame.</h1>
+<p>From clean modern lines to timeless wooden finishes, discover a frame that makes your favourite moments feel even more special.</p>
+<div class="hero-actions">
+<a class="btn btn-primary" href="#shop">Explore the collection ↓</a>
+<a class="btn btn-light" href="customize.html">Create a custom frame</a>
+</div>
+</section>
+
+<main id="shop">
+<div class="toolbar">
+<div class="filter-wrap">
+<label for="search">SEARCH FRAMES</label>
+<input class="field" id="search" type="search" placeholder="Try “wooden” or “classic”…">
+</div>
+<div class="filter-wrap">
+<label for="category">CATEGORY</label>
+<select class="field" id="category"><option value="all">All categories</option></select>
+</div>
+<div class="filter-wrap">
+<label for="sort">SORT BY</label>
+<select class="field" id="sort">
+<option value="featured">Featured</option>
+<option value="low">Price: low to high</option>
+<option value="high">Price: high to low</option>
+<option value="az">Name: A to Z</option>
+</select>
+</div>
+<div class="filter-wrap">
+<label for="maxPrice">MAX PRICE: ₹<span id="priceLabel">1000</span></label>
+<input class="field" id="maxPrice" type="range" min="200" max="1000" step="50" value="1000" style="padding:9px 5px;accent-color:#f05a8a">
+</div>
+</div>
+
+<div class="chips" id="chips">
+<button class="chip active" data-filter="all">All frames</button>
+<button class="chip" data-filter="favorites">♥ Saved favourites</button>
+<button class="chip" data-filter="under350">Under ₹350</button>
+<button class="chip" data-filter="wood">Wood styles</button>
+</div>
+
+<div class="result-row">
+<span id="resultCount">Loading frames…</span>
+<span>Thoughtfully selected · Prices in INR</span>
+</div>
+<div class="product-grid" id="productList"></div>
+</main>
+
+<footer>
+<strong>Framify</strong> · Frame Your Memories, Showcase Your Style.
+<br><br>© 2026 Framify. Made for the moments that matter.
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const products = [
+{id:1,name:"Metal Frame - Classic",price:200,category:"Metal",img:"images/frame5.jpg",description:"Simple, durable and timeless."},
+{id:2,name:"Wooden Frame - Modern",price:450,category:"Wood",img:"images/frame6.jpg",description:"Warm natural finish for everyday memories."},
+{id:3,name:"Vintage Frame - Luxury",price:500,category:"Vintage",img:"images/frame7.jpg",description:"A nostalgic touch for treasured photos."},
+{id:4,name:"Golden Frame - Elegant",price:350,category:"Decorative",img:"images/frame8.jpg",description:"A golden accent for special moments."},
+{id:5,name:"Black Frame - Retro",price:400,category:"Modern",img:"images/frame9.jpeg",description:"Bold contrast with a clean finish."},
+{id:6,name:"Box Frame - Minimal",price:300,category:"Modern",img:"images/frame10.jpg",description:"Minimal depth with a contemporary look."},
+{id:7,name:"White Frame - Modern",price:320,category:"Modern",img:"images/frame11.jpg",description:"Bright, clean and easy to style."},
+{id:8,name:"Rustic Frame - Country",price:280,category:"Wood",img:"images/frame13.jpg",description:"Rustic charm with a natural feel."},
+{id:9,name:"Bronze Frame - Classic",price:550,category:"Decorative",img:"images/frame14.jpg",description:"A rich finish for statement walls."},
+{id:10,name:"Ornate Frame - Royal",price:600,category:"Decorative",img:"images/frame15.jpg",description:"Detailed design for a classic interior."},
+{id:11,name:"Minimal Frame - Zen",price:250,category:"Modern",img:"images/frame16.jpg",description:"Understated design for peaceful spaces."},
+{id:12,name:"Acrylic Frame - Clear",price:350,category:"Acrylic",img:"images/frame17.jpg",description:"A sleek, modern display style."},
+{id:13,name:"Colorful Frame - Pop",price:400,category:"Colorful",img:"images/frame18.webp",description:"Add a playful splash of colour."},
+{id:14,name:"Glass Frame - Sleek",price:450,category:"Glass",img:"images/frame19.webp",description:"A crisp look for modern spaces."},
+{id:15,name:"Leather Frame - Luxury",price:700,category:"Premium",img:"images/frame20.avif",description:"A refined finish for memorable gifts."},
+{id:16,name:"Marble Frame - Elegant",price:800,category:"Premium",img:"images/frame21.jpg",description:"Elegant texture with a premium look."},
+{id:17,name:"Bamboo Frame - Eco",price:270,category:"Wood",img:"images/frame22.jpg",description:"Natural style with an earthy feel."},
+{id:18,name:"Pine Frame - Natural",price:300,category:"Wood",img:"images/frame23.webp",description:"Light wood tones for cozy rooms."},
+{id:19,name:"Cherry Wood Frame - Premium",price:500,category:"Wood",img:"images/frame24.jpg",description:"Rich wood character and warmth."},
+{id:20,name:"Walnut Frame - Classic",price:550,category:"Wood",img:"images/frame25.jpg",description:"Deep tones with a timeless profile."},
+{id:21,name:"Oak Frame - Timeless",price:450,category:"Wood",img:"images/frame26.webp",description:"A versatile classic for your home."},
+{id:22,name:"Maple Frame - Smooth",price:400,category:"Wood",img:"images/frame27.jpg",description:"Smooth finish with a light, modern tone."},
+{id:23,name:"Teak Frame - Strong",price:600,category:"Wood",img:"images/frame28.webp",description:"A durable style with a rich finish."},
+{id:24,name:"Mahogany Frame - Royal",price:750,category:"Premium",img:"images/frame29.png",description:"A luxurious look for a special photograph."},
+{id:25,name:"Gallery Frame - Signature",price:390,category:"Modern",img:"images/frame1.jpg",description:"A gallery-inspired look for your favourite print."},
+{id:26,name:"Portrait Frame - Essential",price:220,category:"Classic",img:"images/frame2.png",description:"An everyday favourite for portraits."},
+{id:27,name:"Memory Frame - Heritage",price:330,category:"Vintage",img:"images/frame3.jpg",description:"Keep your best memories beautifully displayed."},
+{id:28,name:"Collage Frame - Family",price:650,category:"Collage",img:"images/frame4.jpg",description:"Bring multiple favourite moments together."},
+{id:29,name:"Classic Frame - Everyday",price:260,category:"Classic",img:"images/frame12.jpg",description:"A simple frame that fits almost anywhere."},
+{id:30,name:"Art Frame - Studio",price:480,category:"Decorative",img:"images/frame14.jpg",description:"Showcase artwork with a refined border."}
+];
+
+function readStore(key,fallback){
+try{
+const value=JSON.parse(localStorage.getItem(key));
+return value ?? fallback;
+}catch{
+return fallback;
+}
+}
+
+function saveStore(key,value){
+localStorage.setItem(key,JSON.stringify(value));
+}
+
+function escapeHTML(value){
+return String(value).replace(/[&<>"']/g,char=>({
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#39;'
+}[char]));
+}
+
+let cart=readStore('cart',[]);
+if(!Array.isArray(cart))cart=[];
+
+let favorites=readStore('framifyFavorites',[]);
+if(!Array.isArray(favorites))favorites=[];
+
+let activeChip='all';
+let toastTimer;
+
+const $=id=>document.getElementById(id);
+
+function syncCartCount(){
+$('cartCount').textContent=cart.reduce((sum,item)=>sum+(Number(item.quantity)||1),0);
+}
+
+function showToast(message){
+const element=$('toast');
+element.textContent=message;
+element.classList.add('show');
+clearTimeout(toastTimer);
+toastTimer=setTimeout(()=>element.classList.remove('show'),2300);
+}
+
+function addToCart(id){
+const product=products.find(item=>item.id===id);
+if(!product)return;
+
+const existing=cart.find(item=>Number(item.id)===id);
+
+if(existing){
+existing.quantity=(Number(existing.quantity)||1)+1;
+}else{
+cart.push({...product,quantity:1});
+}
+
+saveStore('cart',cart);
+syncCartCount();
+showToast(product.name+' added to your cart');
+}
+
+function toggleFavorite(id){
+favorites=favorites.includes(id)
+?favorites.filter(item=>item!==id)
+:[...favorites,id];
+
+saveStore('framifyFavorites',favorites);
+renderProducts();
+}
+
+function setChip(filter){
+activeChip=filter;
+
+document.querySelectorAll('.chip').forEach(button=>{
+button.classList.toggle('active',button.dataset.filter===filter);
+});
+
+renderProducts();
+}
+
+function getFiltered(){
+const query=$('search').value.trim().toLowerCase();
+const category=$('category').value;
+const maxPrice=Number($('maxPrice').value);
+
+let list=products.filter(product=>
+product.price<=maxPrice&&
+(category==='all'||product.category===category)&&
+(!query||(product.name+' '+product.category+' '+product.description).toLowerCase().includes(query))
+);
+
+if(activeChip==='favorites'){
+list=list.filter(product=>favorites.includes(product.id));
+}
+
+if(activeChip==='under350'){
+list=list.filter(product=>product.price<350);
+}
+
+if(activeChip==='wood'){
+list=list.filter(product=>product.category==='Wood');
+}
+
+const sort=$('sort').value;
+
+if(sort==='low')list.sort((a,b)=>a.price-b.price);
+if(sort==='high')list.sort((a,b)=>b.price-a.price);
+if(sort==='az')list.sort((a,b)=>a.name.localeCompare(b.name));
+
+return list;
+}
+
+function renderProducts(){
+const list=getFiltered();
+$('resultCount').textContent=`Showing ${list.length} of ${products.length} frames`;
+$('priceLabel').textContent=$('maxPrice').value;
+
+const grid=$('productList');
+
+if(!list.length){
+grid.innerHTML='<div class="empty"><strong>No frames found</strong>Try changing your search or filters.</div>';
+return;
+}
+
+grid.innerHTML=list.map(product=>{
+const saved=favorites.includes(product.id);
+
+return `
+<article class="product-card">
+<div class="photo-wrap">
+<img src="${escapeHTML(product.img)}" alt="${escapeHTML(product.name)}" loading="lazy" onerror="this.onerror=null;this.src='images/frame1.jpg'">
+<span class="tag">${escapeHTML(product.category)}</span>
+<button class="heart ${saved?'saved':''}" aria-label="${saved?'Remove from':'Add to'} favourites" title="Save favourite" aria-pressed="${saved}" onclick="toggleFavorite(${product.id})">${saved?'♥':'♡'}</button>
+</div>
+<div class="product-info">
+<div class="category">${escapeHTML(product.category)} collection</div>
+<h3>${escapeHTML(product.name)}</h3>
+<p class="desc">${escapeHTML(product.description)}</p>
+<div class="price-row">
+<span class="price">₹${product.price.toLocaleString('en-IN')}</span>
+<button class="add-btn" onclick="addToCart(${product.id})">＋ Add to cart</button>
+</div>
+</div>
+</article>`;
+}).join('');
+}
+
+const categories=[...new Set(products.map(product=>product.category))].sort();
+
+categories.forEach(category=>{
+const option=document.createElement('option');
+option.value=category;
+option.textContent=category;
+$('category').appendChild(option);
+});
+
+$('search').addEventListener('input',renderProducts);
+$('category').addEventListener('change',renderProducts);
+$('sort').addEventListener('change',renderProducts);
+$('maxPrice').addEventListener('input',renderProducts);
+
+document.querySelectorAll('.chip').forEach(button=>{
+button.addEventListener('click',()=>setChip(button.dataset.filter));
+});
+
+syncCartCount();
+renderProducts();
+</script>
+</body>
+</html>

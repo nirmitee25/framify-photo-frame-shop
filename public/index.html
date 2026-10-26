@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101820">
+
+    <title>Account | Framify</title>
+
+    <link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="brand" href="frame.html">
+        framify<span>.</span>
+    </a>
+
+    <nav class="nav" aria-label="Main navigation">
+        <a href="frame.html">Home</a>
+        <a href="product.html">Shop frames</a>
+        <a href="customize.html">Customize</a>
+        <a class="active" href="index.html" aria-current="page">Account</a>
+
+        <a class="cart-pill" href="cart.html">
+            Cart (<span class="cartCount">0</span>)
+        </a>
+    </nav>
+</header>
+
+<main class="login-shell">
+
+    <section class="form-card login-card">
+
+        <span class="eyebrow">Welcome to Framify</span>
+
+        <h1 style="font-size:38px;margin:8px 0 12px">
+            Your memories, your style.
+        </h1>
+
+        <p>Sign in or create an account to continue exploring.</p>
+
+        <div class="tab-buttons" role="tablist" aria-label="Account options">
+            <button
+                class="active"
+                type="button"
+                data-tab="login"
+                role="tab"
+                aria-selected="true"
+                aria-controls="login"
+            >
+                Login
+            </button>
+
+            <button
+                type="button"
+                data-tab="signup"
+                role="tab"
+                aria-selected="false"
+                aria-controls="signup"
+            >
+                Create account
+            </button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div id="login" class="tab-content active" role="tabpanel">
+
+            <form id="loginForm">
+
+                <div class="form-field">
+                    <label for="username">Username or email</label>
+
+                    <input
+                        class="field"
+                        id="username"
+                        name="username"
+                        required
+                        autocomplete="username"
+                    >
+                </div>
+
+                <div class="form-field" style="margin-top:14px">
+                    <label for="password">Password</label>
+
+                    <input
+                        class="field"
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+
+                <button
+                    class="btn"
+                    style="width:100%;margin-top:20px"
+                    type="submit"
+                    id="loginButton"
+                >
+                    Login ↗
+                </button>
+
+                <p
+                    id="loginMessage"
+                    class="message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
+            </form>
+        </div>
+
+        <!-- SIGNUP FORM -->
+        <div id="signup" class="tab-content" role="tabpanel" hidden>
+
+            <form id="signupForm">
+
+                <div class="form-field">
+                    <label for="newUsername">Username</label>
+
+                    <input
+                        class="field"
+                        id="newUsername"
+                        name="username"
+                        required
+                        minlength="3"
+                        maxlength="30"
+                        autocomplete="username"
+                    >
+                </div>
+
+                <div class="form-field" style="margin-top:14px">
+                    <label for="newEmail">Email</label>
+
+                    <input
+                        class="field"
+                        id="newEmail"
+                        name="email"
+                        type="email"
+                        required
+                        maxlength="254"
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="form-field" style="margin-top:14px">
+                    <label for="newPassword">Password</label>
+
+                    <input
+                        class="field"
+                        id="newPassword"
+                        name="password"
+                        type="password"
+                        required
+                        minlength="6"
+                        autocomplete="new-password"
+                    >
+
+                    <span class="password-note">
+                        Use at least 6 characters.
+                    </span>
+                </div>
+
+                <button
+                    class="btn"
+                    style="width:100%;margin-top:20px"
+                    type="submit"
+                    id="signupButton"
+                >
+                    Create account ↗
+                </button>
+
+                <p
+                    id="signupMessage"
+                    class="message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
+            </form>
+        </div>
+
+        <p class="password-note" style="margin-top:20px">
+            This demo stores account information in this browser only.
+            Do not use a real or reused password. For a live website,
+            use secure backend authentication.
+        </p>
+
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    <strong>framify.</strong>
+
+    <p>Frame Your Memories, Showcase Your Style.</p>
+
+    <p>© <span id="currentYear">2026</span> Framify</p>
+</footer>
+
+<script>
+"use strict";
+
+// Read registered demo accounts
+function getUsers() {
+    try {
+        const stored = JSON.parse(
+            localStorage.getItem("framifyUsers") || "[]"
+        );
+
+        return Array.isArray(stored) ? stored : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+// Update cart count
+function updateCartCount() {
+    try {
+        const cart = JSON.parse(
+            localStorage.getItem("cart") || "[]"
+        );
+
+        const count = Array.isArray(cart)
+            ? cart.reduce((total, item) => {
+                if (!item || typeof item !== "object") {
+                    return total;
+                }
+
+                return total + Math.max(
+                    1,
+                    Math.floor(Number(item.quantity) || 1)
+                );
+            }, 0)
+            : 0;
+
+        document.querySelectorAll(".cartCount").forEach(element => {
+            element.textContent = count;
+        });
+    } catch (error) {
+        document.querySelectorAll(".cartCount").forEach(element => {
+            element.textContent = "0";
+        });
+    }
+}
+
+updateCartCount();
+
+window.addEventListener("pageshow", updateCartCount);
+
+window.addEventListener("storage", event => {
+    if (event.key === "cart") {
+        updateCartCount();
+    }
+});
+
+// Update footer year
+document.getElementById("currentYear").textContent =
+    new Date().getFullYear();
+
+// Switch between login and signup
+document.querySelectorAll("[data-tab]").forEach(button => {
+    button.addEventListener("click", () => {
+        const selectedTab = button.dataset.tab;
+
+        document.querySelectorAll("[data-tab]").forEach(tab => {
+            const active = tab === button;
+
+            tab.classList.toggle("active", active);
+            tab.setAttribute("aria-selected", String(active));
+        });
+
+        document.querySelectorAll(".tab-content").forEach(panel => {
+            const active = panel.id === selectedTab;
+
+            panel.classList.toggle("active", active);
+            panel.hidden = !active;
+        });
+    });
+});
+
+// Display a message safely
+function showMessage(element, message, type) {
+    element.className = "message " + type;
+    element.textContent = message;
+}
+
+// CREATE ACCOUNT
+document.getElementById("signupForm").addEventListener(
+    "submit",
+    function (event) {
+        event.preventDefault();
+
+        const username = document.getElementById("newUsername")
+            .value.trim();
+
+        const email = document.getElementById("newEmail")
+            .value.trim().toLowerCase();
+
+        const password = document.getElementById("newPassword").value;
+
+        const message = document.getElementById("signupMessage");
+
+        if (username.length < 3) {
+            showMessage(
+                message,
+                "Username must contain at least 3 characters.",
+                "error"
+            );
+            return;
+        }
+
+        if (password.length < 6) {
+            showMessage(
+                message,
+                "Password must contain at least 6 characters.",
+                "error"
+            );
+            return;
+        }
+
+        const list = getUsers();
+
+        const alreadyExists = list.some(user =>
+            user &&
+            (
+                String(user.email).toLowerCase() === email ||
+                String(user.username).toLowerCase() ===
+                    username.toLowerCase()
+            )
+        );
+
+        if (alreadyExists) {
+            showMessage(
+                message,
+                "This username or email is already registered.",
+                "error"
+            );
+            return;
+        }
+
+        // Demo only: passwords are not securely hashed here.
+        list.push({
+            username: username,
+            email: email,
+            password: password
+        });
+
+        try {
+            localStorage.setItem(
+                "framifyUsers",
+                JSON.stringify(list)
+            );
+
+            showMessage(
+                message,
+                "Account created successfully! You can now log in.",
+                "success"
+            );
+
+            event.target.reset();
+
+            document.getElementById("username").value = email;
+
+            document.querySelector('[data-tab="login"]').click();
+
+        } catch (error) {
+            showMessage(
+                message,
+                "Could not save the account in this browser.",
+                "error"
+            );
+        }
+    }
+);
+
+// LOGIN
+document.getElementById("loginForm").addEventListener(
+    "submit",
+    function (event) {
+        event.preventDefault();
+
+        const key = document.getElementById("username")
+            .value.trim().toLowerCase();
+
+        const password = document.getElementById("password").value;
+
+        const message = document.getElementById("loginMessage");
+
+        const user = getUsers().find(account =>
+            account &&
+            (
+                String(account.username).toLowerCase() === key ||
+                String(account.email).toLowerCase() === key
+            ) &&
+            account.password === password
+        );
+
+        if (!user) {
+            showMessage(
+                message,
+                "Account not found or password does not match. " +
+                "Please create an account first.",
+                "error"
+            );
+            return;
+        }
+
+        try {
+            localStorage.setItem(
+                "framifyCurrentUser",
+                JSON.stringify({
+                    username: user.username,
+                    email: user.email
+                })
+            );
+
+            showMessage(
+                message,
+                "Welcome back, " + user.username +
+                "! Opening the shop…",
+                "success"
+            );
+
+            document.getElementById("loginButton").disabled = true;
+
+            setTimeout(() => {
+                window.location.href = "frame.html";
+            }, 650);
+
+        } catch (error) {
+            showMessage(
+                message,
+                "Could not save your login session in this browser.",
+                "error"
+            );
+        }
+    }
+);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart | Framify</title>
+    <link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="brand" href="frame.html">framify<span>.</span></a>
+
+    <nav class="nav">
+        <a href="frame.html">Home</a>
+        <a href="product.html">Shop frames</a>
+        <a href="customize.html">Customize</a>
+        <a href="index.html">Account</a>
+        <a class="cart-pill active" href="cart.html">
+            Cart (<span class="cartCount">0</span>)
+        </a>
+    </nav>
+</header>
+
+<main class="wrap">
+
+    <section class="page-intro">
+        <span class="eyebrow">Almost yours</span>
+        <h1>Your shopping bag.</h1>
+        <p>Review your frames and add your delivery details to place an order.</p>
+    </section>
+
+    <div class="cart-layout">
+
+        <section class="content-card">
+            <h2 style="font-size:25px;margin-top:0">Your items</h2>
+
+            <div id="cartItems"></div>
+
+            <p id="cartMessage" class="message" role="status"></p>
+
+            <a class="btn btn-light" href="product.html">
+                ← Continue shopping
+            </a>
+        </section>
+
+        <aside class="content-card">
+            <h2 style="font-size:25px;margin-top:0">Order summary</h2>
+
+            <div class="summary-line">
+                <span>Subtotal</span>
+                <strong id="subtotal">₹0</strong>
+            </div>
+
+            <div class="summary-line">
+                <span>Delivery</span>
+                <strong id="delivery">—</strong>
+            </div>
+
+            <div class="summary-line total">
+                <span>Total</span>
+                <strong id="total">₹0</strong>
+            </div>
+
+            <p style="font-size:12px">
+                This demo saves orders through the Framify backend.
+                Online payments are not processed unless a verified
+                payment gateway is configured.
+            </p>
+
+            <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
+
+            <h2 style="font-size:22px">Delivery details</h2>
+
+            <form id="checkoutForm">
+
+                <div class="form-field">
+                    <label for="name">Full name *</label>
+                    <input class="field" id="name" name="name"
+                           autocomplete="name" required>
+                </div>
+
+                <div class="form-field" style="margin-top:13px">
+                    <label for="email">Email *</label>
+                    <input class="field" id="email" name="email"
+                           type="email" autocomplete="email" required>
+                </div>
+
+                <div class="form-field" style="margin-top:13px">
+                    <label for="phone">Phone *</label>
+                    <input class="field" id="phone" name="phone"
+                           type="tel" pattern="[0-9+() -]{8,18}" required>
+                </div>
+
+                <div class="form-field" style="margin-top:13px">
+                    <label for="address">Full delivery address *</label>
+                    <textarea class="field" id="address" name="address"
+                              autocomplete="street-address" required></textarea>
+                </div>
+
+                <button class="btn" id="orderButton" type="submit"
+                        style="width:100%;margin-top:18px">
+                    Place order ↗
+                </button>
+
+                <p id="orderMessage" class="message" role="status"></p>
+
+            </form>
+        </aside>
+
+    </div>
+</main>
+
+<footer class="site-footer">
+    <strong>framify.</strong>
+    <p>Frame Your Memories, Showcase Your Style.</p>
+    <p>© 2026 Framify</p>
+</footer>
+
+<script>
+"use strict";
+
+let cart = [];
+
+try {
+    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    if (Array.isArray(storedCart)) {
+        cart = storedCart
+            .filter(item => item && typeof item === "object")
+            .map((item, index) => ({
+                id: item.id ?? item.name ?? index,
+                name: String(item.name || "Photo frame"),
+                img: String(item.img || "images/frame1.jpg"),
+                price: Number(item.price) || 0,
+                quantity: Math.max(1, Math.floor(Number(item.quantity) || 1))
+            }))
+            .filter(item => item.price >= 0);
+    }
+} catch (error) {
+    cart = [];
+}
+
+const money = amount =>
+    "₹" + Number(amount).toLocaleString("en-IN");
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+function saveCart() {
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+}
+
+function updateCartCount() {
+    const count = cart.reduce(
+        (total, item) => total + item.quantity, 0
+    );
+
+    document.querySelectorAll(".cartCount").forEach(element => {
+        element.textContent = count;
+    });
+}
+
+function renderCart() {
+    const cartItems = document.getElementById("cartItems");
+    const subtotalElement = document.getElementById("subtotal");
+    const deliveryElement = document.getElementById("delivery");
+    const totalElement = document.getElementById("total");
+    const orderButton = document.getElementById("orderButton");
+
+    if (cart.length === 0) {
+        cartItems.innerHTML = `
+            <div class="empty">
+                <h3>Your cart is waiting for a frame.</h3>
+                <p>Explore the collection and add a design you love.</p>
+                <a class="btn" href="product.html">Browse frames</a>
+            </div>
+        `;
+    } else {
+        cartItems.innerHTML = cart.map((item, index) => `
+            <article class="cart-item">
+                <img
+                    src="${escapeHTML(item.img)}"
+                    alt="${escapeHTML(item.name)}"
+                    onerror="this.onerror=null;this.src='images/frame1.jpg'"
+                >
+
+                <div>
+                    <h3>${escapeHTML(item.name)}</h3>
+                    <p>${money(item.price)} each</p>
+
+                    <div class="qty">
+                        <button type="button"
+                            aria-label="Decrease quantity"
+                            onclick="changeQty(${index}, -1)">−</button>
+
+                        <strong>${item.quantity}</strong>
+
+                        <button type="button"
+                            aria-label="Increase quantity"
+                            onclick="changeQty(${index}, 1)">+</button>
+                    </div>
+
+                    <button class="remove" type="button"
+                        onclick="removeItem(${index})">
+                        Remove
+                    </button>
+                </div>
+
+                <div class="item-end">
+                    <strong>${money(item.price * item.quantity)}</strong>
+                </div>
+            </article>
+        `).join("");
+    }
+
+    const subtotal = cart.reduce(
+        (total, item) => total + item.price * item.quantity, 0
+    );
+
+    subtotalElement.textContent = money(subtotal);
+    totalElement.textContent = money(subtotal);
+    deliveryElement.textContent = subtotal > 0 ? "Free" : "—";
+
+    orderButton.disabled = cart.length === 0;
+    orderButton.style.opacity = cart.length > 0 ? "1" : "0.5";
+
+    updateCartCount();
+}
+
+function changeQty(index, difference) {
+    if (!cart[index]) return;
+
+    cart[index].quantity += difference;
+
+    if (cart[index].quantity <= 0) {
+        cart.splice(index, 1);
+    }
+
+    saveCart();
+}
+
+function removeItem(index) {
+    if (!cart[index]) return;
+
+    cart.splice(index, 1);
+    saveCart();
+}
+
+renderCart();
+
+document.getElementById("checkoutForm").addEventListener(
+    "submit",
+    async function (event) {
+        event.preventDefault();
+
+        if (cart.length === 0) return;
+
+        const button = document.getElementById("orderButton");
+        const message = document.getElementById("orderMessage");
+
+        button.disabled = true;
+        button.textContent = "Saving order…";
+
+        message.className = "message";
+        message.textContent = "Submitting your order details…";
+
+        const orderTotal = cart.reduce(
+            (total, item) => total + item.price * item.quantity, 0
+        );
+
+        const order = {
+            name: document.getElementById("name").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            phone: document.getElementById("phone").value.trim(),
+            address: document.getElementById("address").value.trim(),
+
+            cart: cart.map(item => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity
+            })),
+
+            total: orderTotal
+        };
+
+        try {
+            const response = await fetch("/api/order", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(order)
+            });
+
+            let result = {};
+
+            try {
+                result = await response.json();
+            } catch (error) {
+                throw new Error("The server returned an invalid response.");
+            }
+
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.error || "Your order could not be saved."
+                );
+            }
+
+            localStorage.removeItem("cart");
+            cart = [];
+
+            renderCart();
+            event.target.reset();
+
+            message.className = "message success";
+            message.textContent =
+                "Order placed successfully! Reference: " +
+                (result.data?._id || "saved") +
+                ". This is an order confirmation, not a payment receipt.";
+
+        } catch (error) {
+            message.className = "message error";
+
+            if (error instanceof TypeError) {
+                message.textContent =
+                    "Could not connect to Framify. Start your server " +
+                    "and check that MongoDB is connected.";
+            } else {
+                message.textContent = error.message;
+            }
+
+        } finally {
+            button.disabled = cart.length === 0;
+            button.textContent = "Place order ↗";
+        }
+    }
+);
+</script>
+
+</body>
+</html>
